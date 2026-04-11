@@ -31,4 +31,6 @@ export const router = createBrowserRouter([
       { path: "profile/:id", Component: StudentProfile },
     ]
   }
-]);
+], {
+  basename: import.meta.env.BASE_URL,
+});
