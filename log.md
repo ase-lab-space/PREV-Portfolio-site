@@ -6,6 +6,16 @@ React 18 + TypeScript + Vite 6 + Tailwind CSS 4 + shadcn/ui 構成のポート�
 【作業時間】
 60 秒
 
+[2026/04/11 00:00:04]
+【要求】
+GitHub Pages でプロジェクトを公開する方法と実装
+【提案】
+vite.config.ts に base パスを追加し、GitHub Actions の deploy.yml を作成する方法を提案
+【結論】
+vite.config.ts に `base: '/PREV-Portfolio-site/'` を追加。`.github/workflows/deploy.yml` を新規作成し、main ブランチへの push 時に自動ビルド＆デプロイされる GitHub Actions ワークフローを設定。公開 URL: https://ase-lab-space.github.io/PREV-Portfolio-site/
+【作業時間】
+60 秒
+
 [2026/04/11 00:00:03]
 【要求】
 README.md にフォルダ構成と使用技術を追記してほしい
