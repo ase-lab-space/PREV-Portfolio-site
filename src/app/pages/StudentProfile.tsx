@@ -97,144 +97,141 @@ export function StudentProfile() {
         </div>
       </div>
 
-      {/* 2x2 メイングリッド: リファレンス画像のレイアウトに合わせる */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {/* メイングリッド: 3カラム (左=AstroCampでの成長, 中=経歴・活動歴, 右=ソフトスキル成長 + 専門領域・技術 縦積み) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-        {/* AstroCampでの成長 (Before/After) */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-4 h-4" />
+        {/* AstroCampでの成長 (Before/After) — Activity Outcome 画像は削除 */}
+        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center">
+              <Sparkles className="w-3.5 h-3.5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900">AstroCamp での成長</h2>
-              <p className="text-[11px] text-slate-500 mt-0.5">プログラムを通じた価値観とスキルの変化</p>
+              <h2 className="text-sm font-bold text-slate-900">AstroCamp での成長</h2>
+              <p className="text-[10px] text-slate-500 mt-0.5">プログラムを通じた価値観とスキルの変化</p>
             </div>
           </div>
 
           {student.astroCampActivities.map((activity, idx) => (
-            <div key={idx} className="space-y-3">
-              <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                <Rocket className="w-4 h-4 text-indigo-500" />
+            <div key={idx} className="space-y-2.5">
+              <h3 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Rocket className="w-3.5 h-3.5 text-indigo-500" />
                 {activity.program}
               </h3>
 
-              <div className="grid grid-cols-2 gap-2.5 relative">
-                {/* Connection arrow */}
-                <div className="hidden sm:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-white border border-slate-200 rounded-full items-center justify-center shadow-sm text-indigo-500">
-                  <ChevronRight className="w-4 h-4" />
-                </div>
-
-                <div className="bg-slate-50 rounded-lg p-3 border border-slate-200 relative">
-                  <div className="absolute -top-2 left-2.5 bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider">
+              <div className="space-y-2 relative">
+                <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-200 relative">
+                  <div className="absolute -top-2 left-2 bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-full text-[8px] font-bold tracking-wider">
                     BEFORE
                   </div>
-                  <div className="mt-1 text-xs text-slate-600 leading-relaxed">
+                  <div className="mt-1 text-[11px] text-slate-600 leading-snug">
                     {activity.before}
                   </div>
                 </div>
 
-                <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-100 relative">
-                  <div className="absolute -top-2 left-2.5 bg-indigo-600 text-white px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider">
+                {/* 矢印インジケータ */}
+                <div className="flex justify-center">
+                  <div className="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-indigo-500 shadow-sm">
+                    <ChevronRight className="w-3.5 h-3.5 rotate-90" />
+                  </div>
+                </div>
+
+                <div className="bg-indigo-50 rounded-lg p-2.5 border border-indigo-100 relative">
+                  <div className="absolute -top-2 left-2 bg-indigo-600 text-white px-1.5 py-0.5 rounded-full text-[8px] font-bold tracking-wider">
                     AFTER
                   </div>
-                  <div className="mt-1 text-xs text-indigo-900 leading-relaxed font-bold">
+                  <div className="mt-1 text-[11px] text-indigo-900 leading-snug font-bold">
                     {activity.after}
                   </div>
                 </div>
               </div>
-
-              {activity.image && (
-                <div className="mt-3 rounded-lg overflow-hidden border border-slate-200 aspect-[16/9] relative">
-                  <img src={activity.image} alt="Activity Outcome" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-2">
-                    <span className="text-white text-[11px] font-medium flex items-center gap-1"><Activity className="w-3 h-3"/> Activity Outcome</span>
-                  </div>
-                </div>
-              )}
             </div>
           ))}
         </section>
 
         {/* 経歴・活動歴 */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-8 h-8 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center border border-slate-200">
-              <CalendarDays className="w-4 h-4" />
+        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center border border-slate-200">
+              <CalendarDays className="w-3.5 h-3.5" />
             </div>
-            <h2 className="text-base font-bold text-slate-900">経歴・活動歴</h2>
+            <h2 className="text-sm font-bold text-slate-900">経歴・活動歴</h2>
           </div>
 
-          <div className="relative pl-5 space-y-3 before:absolute before:left-[7px] before:top-1.5 before:bottom-1.5 before:w-0.5 before:bg-gradient-to-b before:from-slate-200 before:via-indigo-200 before:to-slate-200">
+          <div className="relative pl-4 space-y-2.5 before:absolute before:left-[5px] before:top-1.5 before:bottom-1.5 before:w-0.5 before:bg-gradient-to-b before:from-slate-200 before:via-indigo-200 before:to-slate-200">
             {student.history.map((item, index) => (
               <div key={index} className="relative">
-                <div className="absolute -left-5 top-2 w-3 h-3 rounded-full bg-white border-[3px] border-indigo-500"></div>
-                <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                  <div className="text-[10px] font-bold text-indigo-600 tracking-wider mb-0.5">{item.year}</div>
-                  <h3 className="text-sm font-bold text-slate-900 mb-1">{item.title}</h3>
-                  <p className="text-xs text-slate-600 leading-relaxed">{item.description}</p>
+                <div className="absolute -left-4 top-1.5 w-2.5 h-2.5 rounded-full bg-white border-[2.5px] border-indigo-500"></div>
+                <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                  <div className="text-[9px] font-bold text-indigo-600 tracking-wider mb-0.5">{item.year}</div>
+                  <h3 className="text-xs font-bold text-slate-900 mb-0.5">{item.title}</h3>
+                  <p className="text-[11px] text-slate-600 leading-snug">{item.description}</p>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* ソフトスキル成長 (radar) */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-          <div className="flex items-center gap-2.5 mb-1">
-            <div className="w-8 h-8 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-4 h-4" />
+        {/* 右カラム: ソフトスキル成長 + 専門領域・技術 を縦積み */}
+        <div className="space-y-4">
+
+          {/* ソフトスキル成長 (radar) */}
+          <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+            <div className="flex items-center gap-2 mb-0.5">
+              <div className="w-7 h-7 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-3.5 h-3.5" />
+              </div>
+              <h2 className="text-sm font-bold text-slate-900">ソフトスキル成長</h2>
             </div>
-            <h2 className="text-base font-bold text-slate-900">ソフトスキル成長</h2>
-          </div>
-          <p className="text-[11px] text-slate-500 mb-3 ml-10">参加前(Week0)と修了時(Week4)</p>
+            <p className="text-[10px] text-slate-500 ml-9 mb-2">参加前(Week0)と修了時(Week4)</p>
 
-          <div className="h-[220px] w-full -ml-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                <PolarGrid stroke="#e2e8f0" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10, fontWeight: 600 }} />
-                <PolarRadiusAxis angle={30} domain={[0, 5]} tick={{ fill: '#94a3b8', fontSize: 9 }} />
-                <Radar name="Week 0" dataKey="Week0" stroke="#94a3b8" fill="#cbd5e1" fillOpacity={0.3} />
-                <Radar name="Week 4" dataKey="Week4" stroke="#6366f1" fill="#818cf8" fillOpacity={0.5} />
-                <Legend wrapperStyle={{ fontSize: '11px', fontWeight: 500 }} />
-                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: 12 }} />
-              </RadarChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
+            <div className="h-[170px] w-full -ml-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart cx="50%" cy="50%" outerRadius="68%" data={radarData}>
+                  <PolarGrid stroke="#e2e8f0" />
+                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 9, fontWeight: 600 }} />
+                  <PolarRadiusAxis angle={30} domain={[0, 5]} tick={{ fill: '#94a3b8', fontSize: 8 }} />
+                  <Radar name="Week 0" dataKey="Week0" stroke="#94a3b8" fill="#cbd5e1" fillOpacity={0.3} />
+                  <Radar name="Week 4" dataKey="Week4" stroke="#6366f1" fill="#818cf8" fillOpacity={0.5} />
+                  <Legend wrapperStyle={{ fontSize: '10px', fontWeight: 500 }} />
+                  <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: 11 }} />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
 
-        {/* 専門領域・技術 */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-          <h2 className="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
-            <Activity className="w-4 h-4 text-indigo-500" />
-            専門領域・技術
-          </h2>
+          {/* 専門領域・技術 */}
+          <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+            <h2 className="text-sm font-bold text-slate-900 mb-2.5 flex items-center gap-1.5">
+              <Activity className="w-3.5 h-3.5 text-indigo-500" />
+              専門領域・技術
+            </h2>
 
-          <div className="space-y-3">
-            <div>
-              <h3 className="text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">興味分野</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {student.interests.map(tag => (
-                  <span key={tag} className="px-2.5 py-0.5 bg-indigo-50 text-indigo-700 text-xs rounded-md font-semibold border border-indigo-100/60">
-                    {tag}
-                  </span>
-                ))}
+            <div className="space-y-2">
+              <div>
+                <h3 className="text-[9px] font-bold text-slate-500 mb-1 uppercase tracking-wider">興味分野</h3>
+                <div className="flex flex-wrap gap-1">
+                  {student.interests.map(tag => (
+                    <span key={tag} className="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-[11px] rounded-md font-semibold border border-indigo-100/60">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-[9px] font-bold text-slate-500 mb-1 uppercase tracking-wider">テクニカルスキル</h3>
+                <div className="flex flex-wrap gap-1">
+                  {student.skills.map(skill => (
+                    <span key={skill} className="px-2 py-0.5 bg-slate-100 text-slate-700 text-[11px] rounded-md font-medium border border-slate-200/60">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
-
-            <div>
-              <h3 className="text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">テクニカルスキル</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {student.skills.map(skill => (
-                  <span key={skill} className="px-2.5 py-0.5 bg-slate-100 text-slate-700 text-xs rounded-md font-medium border border-slate-200/60">
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
 
       {/* キャリア意向 + リンク + 物理カード を 2 カラムで下部 */}
