@@ -97,11 +97,14 @@ export function StudentProfile() {
         </div>
       </div>
 
+      {/* ヒーロー直下のサマリー 3 カード: 志向・成長軌跡・スキル をひと目で */}
+      <ProfileSummaryCards student={student} radarData={radarData} />
+
       {/* メイングリッド: 3カラム (左=AstroCampでの成長, 中=経歴・活動歴, 右=ソフトスキル成長 + 専門領域・技術 縦積み) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
         {/* AstroCampでの成長 (Before/After) — Activity Outcome 画像は削除 */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+        <section id="detail-growth" className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 scroll-mt-20">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center">
               <Sparkles className="w-3.5 h-3.5" />
@@ -173,7 +176,7 @@ export function StudentProfile() {
         </section>
 
         {/* 右カラム: ソフトスキル成長 + 専門領域・技術 を縦積み */}
-        <div className="space-y-4">
+        <div id="detail-skills" className="space-y-4 scroll-mt-20">
 
           {/* ソフトスキル成長 (radar) */}
           <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
@@ -236,7 +239,7 @@ export function StudentProfile() {
 
       {/* キャリア意向 + リンク + 物理カード を 2 カラムで下部 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <section className="bg-white rounded-2xl shadow-sm border border-indigo-100 p-5 relative overflow-hidden">
+        <section id="detail-career" className="bg-white rounded-2xl shadow-sm border border-indigo-100 p-5 relative overflow-hidden scroll-mt-20">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
           <div className="flex items-center gap-2.5 mb-3">
             <div className="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center">
@@ -358,6 +361,183 @@ export function StudentProfile() {
           </div>
         </section>
       )}
+    </div>
+  );
+}
+
+// =====================================================================
+// ヒーロー直下の 3 カードサマリー。
+// 「志向・関心・キャリア志向」「成長の軌跡（Before/After）」「スキル・専門性」を
+// ひと目で見せて、各カードの「もっと見る」で下部の詳細セクションへスクロール。
+// =====================================================================
+const AMBITION_PALETTES = [
+  'bg-rose-50 text-rose-700 border-rose-200',
+  'bg-amber-50 text-amber-700 border-amber-200',
+  'bg-orange-50 text-orange-700 border-orange-200',
+  'bg-sky-50 text-sky-700 border-sky-200',
+  'bg-emerald-50 text-emerald-700 border-emerald-200',
+  'bg-violet-50 text-violet-700 border-violet-200',
+];
+
+type SummaryProps = {
+  student: typeof MOCK_STUDENTS[number] & {
+    ambitionTags?: string[];
+    careerVision?: string;
+    summary?: { before: string; after: string; programName: string; programTitle: string };
+  };
+  radarData: Array<{ subject: string; Week0: number; Week4: number }>;
+};
+
+function ProfileSummaryCards({ student, radarData }: SummaryProps) {
+  const scrollTo = (id: string) => () => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const tags = student.ambitionTags ?? student.interests;
+  const career = student.careerVision ?? student.jobComment;
+  const summary = student.summary ?? {
+    before: student.astroCampActivities[0]?.before ?? '',
+    after: student.astroCampActivities[0]?.after ?? '',
+    programName: 'AstroCamp 2026',
+    programTitle: student.astroCampActivities[0]?.program ?? '',
+  };
+  const subItems = student.astroCampActivities[0]?.subItems ?? [];
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+      {/* 左: 志向・関心・キャリア志向 */}
+      <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-7 h-7 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center">
+            <Target className="w-3.5 h-3.5" />
+          </div>
+          <h2 className="text-sm font-bold text-slate-900">志向・関心・キャリア志向</h2>
+        </div>
+        <p className="text-[10px] text-slate-500 ml-9 mb-3">志向や価値観、関心領域がわかる</p>
+
+        <div className="mb-3">
+          <h3 className="text-[10px] font-bold text-slate-500 mb-1.5 tracking-wider">志向タグ</h3>
+          <div className="flex flex-wrap gap-1.5">
+            {tags.map((tag, i) => (
+              <span
+                key={tag}
+                className={`px-2.5 py-1 text-[11px] rounded-full font-semibold border ${
+                  AMBITION_PALETTES[i % AMBITION_PALETTES.length]
+                }`}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex-1">
+          <h3 className="text-[10px] font-bold text-slate-500 mb-1.5 tracking-wider">キャリア志向</h3>
+          <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 rounded-lg p-2.5 border border-slate-100">
+            {career}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={scrollTo('detail-career')}
+          className="mt-3 self-start text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-0.5"
+        >
+          もっと見る <ChevronRight className="w-3 h-3" />
+        </button>
+      </section>
+
+      {/* 中央: 成長の軌跡（Before / After） */}
+      <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center">
+            <Sparkles className="w-3.5 h-3.5" />
+          </div>
+          <h2 className="text-sm font-bold text-slate-900">成長の軌跡（Before / After）</h2>
+        </div>
+        <p className="text-[10px] text-slate-500 ml-9 mb-3">活動・経験を通じた成長がわかる</p>
+
+        <div className="space-y-2 flex-1">
+          {/* Before */}
+          <div className="bg-rose-50 border border-rose-100 rounded-lg p-2.5">
+            <div className="text-[9px] font-bold text-rose-700 tracking-wider mb-0.5">BEFORE（参加前）</div>
+            <p className="text-[11px] text-slate-700 leading-snug">{summary.before}</p>
+          </div>
+
+          {/* 参加・取り組み */}
+          <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-2.5">
+            <div className="text-[9px] font-bold text-indigo-700 tracking-wider mb-1">参加・取り組み</div>
+            <div className="text-[11px] font-bold text-slate-900">{summary.programName}</div>
+            <div className="text-[11px] text-slate-700 mb-1">{summary.programTitle}</div>
+            {subItems.length > 0 && (
+              <ul className="text-[11px] text-slate-600 list-disc pl-3.5 space-y-0.5">
+                {subItems.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* After */}
+          <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-2.5">
+            <div className="text-[9px] font-bold text-emerald-700 tracking-wider mb-0.5">AFTER（参加後）</div>
+            <p className="text-[11px] text-slate-700 leading-snug">{summary.after}</p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={scrollTo('detail-growth')}
+          className="mt-3 self-start text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-0.5"
+        >
+          もっと見る <ChevronRight className="w-3 h-3" />
+        </button>
+      </section>
+
+      {/* 右: スキル・専門性 */}
+      <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-7 h-7 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center">
+            <TrendingUp className="w-3.5 h-3.5" />
+          </div>
+          <h2 className="text-sm font-bold text-slate-900">スキル・専門性</h2>
+        </div>
+        <p className="text-[10px] text-slate-500 ml-9 mb-2">保有スキルや専門性がわかる</p>
+
+        <div className="h-[170px] -ml-2 flex-shrink-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+              <PolarGrid stroke="#e2e8f0" />
+              <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 9, fontWeight: 600 }} />
+              <PolarRadiusAxis angle={30} domain={[0, 5]} tick={false} axisLine={false} />
+              <Radar name="現在" dataKey="Week4" stroke="#a855f7" fill="#c084fc" fillOpacity={0.5} />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="mt-2 flex-1">
+          <h3 className="text-[10px] font-bold text-slate-500 mb-1.5 tracking-wider">テクニカルスキル</h3>
+          <div className="flex flex-wrap gap-1">
+            {student.skills.map((skill) => (
+              <span
+                key={skill}
+                className="px-2 py-0.5 bg-purple-50 text-purple-700 text-[11px] rounded-md font-semibold border border-purple-100/60"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={scrollTo('detail-skills')}
+          className="mt-3 self-start text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-0.5"
+        >
+          もっと見る <ChevronRight className="w-3 h-3" />
+        </button>
+      </section>
     </div>
   );
 }
