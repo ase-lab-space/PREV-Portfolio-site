@@ -1,51 +1,249 @@
-import { useState } from "react";
-import { Search, Filter, BookmarkPlus, BookmarkCheck, ChevronRight, SlidersHorizontal, MapPin, Building2, BookOpen } from "lucide-react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { Search, BookmarkPlus, BookmarkCheck, ChevronRight, SlidersHorizontal, Building2, BookOpen, X, Tag } from "lucide-react";
 import { MOCK_STUDENTS } from "../data/mock";
 import { Link, useLocation } from "react-router";
 
+const ALL_SKILLS = Array.from(new Set(MOCK_STUDENTS.flatMap(s => s.skills))).sort();
+const ALL_INTERESTS = Array.from(new Set(MOCK_STUDENTS.flatMap(s => s.interests))).sort();
+const JOB_OPTIONS = ["興味あり", "検討中", "今は考えていない"] as const;
+
+type Suggestion = { tag: string; type: "skill" | "interest"; count: number };
+
 export function StudentList() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [showFilter, setShowFilter] = useState(false);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [selectedJobInterests, setSelectedJobInterests] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const isCompanyView = location.pathname.startsWith('/company');
 
-  // Filter mocked
-  const filteredStudents = MOCK_STUDENTS.filter(s => s.name.includes(searchTerm) || s.catchphrase.includes(searchTerm));
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+        setActiveIndex(-1);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const suggestions = useMemo<Suggestion[]>(() => {
+    if (!searchTerm.trim()) return [];
+    const term = searchTerm.toLowerCase();
+    const skills = ALL_SKILLS
+      .filter(s => s.toLowerCase().includes(term) && !selectedSkills.includes(s))
+      .map(s => ({ tag: s, type: "skill" as const, count: MOCK_STUDENTS.filter(st => st.skills.includes(s)).length }));
+    const interests = ALL_INTERESTS
+      .filter(i => i.toLowerCase().includes(term) && !selectedInterests.includes(i))
+      .map(i => ({ tag: i, type: "interest" as const, count: MOCK_STUDENTS.filter(st => st.interests.includes(i)).length }));
+    return [...skills, ...interests].slice(0, 8);
+  }, [searchTerm, selectedSkills, selectedInterests]);
+
+  const selectSuggestion = (s: Suggestion) => {
+    if (s.type === "skill") setSelectedSkills(prev => prev.includes(s.tag) ? prev : [...prev, s.tag]);
+    else setSelectedInterests(prev => prev.includes(s.tag) ? prev : [...prev, s.tag]);
+    setSearchTerm("");
+    setShowSuggestions(false);
+    setActiveIndex(-1);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || suggestions.length === 0) return;
+    if (e.key === "ArrowDown") { e.preventDefault(); setActiveIndex(i => Math.min(i + 1, suggestions.length - 1)); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setActiveIndex(i => Math.max(i - 1, 0)); }
+    else if (e.key === "Enter" && activeIndex >= 0) { e.preventDefault(); selectSuggestion(suggestions[activeIndex]); }
+    else if (e.key === "Escape") { setShowSuggestions(false); setActiveIndex(-1); }
+  };
+
+  const toggleItem = (list: string[], setList: (v: string[]) => void, item: string) => {
+    setList(list.includes(item) ? list.filter(x => x !== item) : [...list, item]);
+  };
+
+  const clearAll = () => {
+    setSelectedSkills([]);
+    setSelectedInterests([]);
+    setSelectedJobInterests([]);
+    setSearchTerm("");
+  };
+
+  const activeFilterCount = selectedSkills.length + selectedInterests.length + selectedJobInterests.length;
+
+  const filteredStudents = useMemo(() => {
+    return MOCK_STUDENTS.filter(s => {
+      const matchesSearch = !searchTerm || s.name.includes(searchTerm) || s.catchphrase.includes(searchTerm) || s.skills.some(sk => sk.includes(searchTerm)) || s.interests.some(i => i.includes(searchTerm));
+      const matchesSkills = selectedSkills.length === 0 || selectedSkills.every(sk => s.skills.includes(sk));
+      const matchesInterests = selectedInterests.length === 0 || selectedInterests.every(i => s.interests.includes(i));
+      const matchesJob = selectedJobInterests.length === 0 || selectedJobInterests.includes(s.jobInterest);
+      return matchesSearch && matchesSkills && matchesInterests && matchesJob;
+    });
+  }, [searchTerm, selectedSkills, selectedInterests, selectedJobInterests]);
 
   return (
     <div className="space-y-6">
       {/* Header & Search */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">参加者一覧</h1>
-          <p className="text-sm text-slate-500 mt-1 flex items-center gap-1.5">
-            <UsersIcon className="w-4 h-4" />
-            <span className="font-semibold text-slate-700">{MOCK_STUDENTS.length}名</span> の参加者が登録しています
-          </p>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">参加者一覧</h1>
+            <p className="text-sm text-slate-500 mt-1 flex items-center gap-1.5">
+              <UsersIcon className="w-4 h-4" />
+              <span className="font-semibold text-slate-700">{filteredStudents.length}名</span>
+              {activeFilterCount > 0 && <span className="text-slate-400">/ {MOCK_STUDENTS.length}名中</span>}
+              {activeFilterCount === 0 && <span>の参加者が登録しています</span>}
+            </p>
+          </div>
+
+          <div className="flex w-full md:w-auto gap-3">
+            {/* Search with suggestions */}
+            <div ref={searchContainerRef} className="relative w-full md:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 z-10" />
+              <input
+                type="text"
+                placeholder="名前、スキル、キーワード..."
+                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm"
+                value={searchTerm}
+                onChange={e => { setSearchTerm(e.target.value); setShowSuggestions(true); setActiveIndex(-1); }}
+                onFocus={() => { if (searchTerm) setShowSuggestions(true); }}
+                onKeyDown={handleKeyDown}
+                autoComplete="off"
+              />
+
+              {/* Suggestion dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden">
+                  <div className="px-3 py-1.5 border-b border-slate-100">
+                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">タグで絞り込む</span>
+                  </div>
+                  {suggestions.map((s, i) => (
+                    <button
+                      key={`${s.type}-${s.tag}`}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors ${i === activeIndex ? "bg-indigo-50" : "hover:bg-slate-50"}`}
+                      onMouseDown={e => { e.preventDefault(); selectSuggestion(s); }}
+                      onMouseEnter={() => setActiveIndex(i)}
+                    >
+                      <Tag className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                      <span className="flex-1 text-sm text-slate-800">
+                        <HighlightMatch text={s.tag} query={searchTerm} />
+                      </span>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${s.type === "skill" ? "bg-slate-100 text-slate-600" : "bg-indigo-50 text-indigo-600"}`}>
+                        {s.type === "skill" ? "スキル" : "興味"}
+                      </span>
+                      <span className="text-[10px] text-slate-400 tabular-nums">{s.count}名</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => setShowFilter(!showFilter)}
+              className={`relative flex items-center gap-2 px-4 py-2 border rounded-lg text-sm font-medium transition-colors whitespace-nowrap shadow-sm ${showFilter ? "bg-indigo-600 border-indigo-600 text-white" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"}`}
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              <span className="hidden sm:inline">絞り込み</span>
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-indigo-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
 
-        <div className="flex w-full md:w-auto gap-3">
-          <div className="relative w-full md:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="名前、スキル、キーワード..."
-              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+        {/* Filter Panel */}
+        {showFilter && (
+          <div className="border-t border-slate-100 pt-4 space-y-4">
+            {/* Skills */}
+            <div>
+              <div className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">スキル</div>
+              <div className="flex flex-wrap gap-1.5">
+                {ALL_SKILLS.map(skill => (
+                  <button
+                    key={skill}
+                    onClick={() => toggleItem(selectedSkills, setSelectedSkills, skill)}
+                    className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${selectedSkills.includes(skill) ? "bg-slate-700 border-slate-700 text-white" : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"}`}
+                  >
+                    {skill}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Interests */}
+            <div>
+              <div className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">興味・関心</div>
+              <div className="flex flex-wrap gap-1.5">
+                {ALL_INTERESTS.map(interest => (
+                  <button
+                    key={interest}
+                    onClick={() => toggleItem(selectedInterests, setSelectedInterests, interest)}
+                    className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${selectedInterests.includes(interest) ? "bg-indigo-600 border-indigo-600 text-white" : "bg-indigo-50 border-indigo-100 text-indigo-700 hover:bg-indigo-100"}`}
+                  >
+                    {interest}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Job Interest */}
+            <div>
+              <div className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">就職/インターン関心度</div>
+              <div className="flex flex-wrap gap-1.5">
+                {JOB_OPTIONS.map(opt => {
+                  const colorMap = { "興味あり": { active: "bg-emerald-600 border-emerald-600 text-white", inactive: "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100" }, "検討中": { active: "bg-amber-500 border-amber-500 text-white", inactive: "bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100" }, "今は考えていない": { active: "bg-slate-500 border-slate-500 text-white", inactive: "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100" } };
+                  const isActive = selectedJobInterests.includes(opt);
+                  return (
+                    <button
+                      key={opt}
+                      onClick={() => toggleItem(selectedJobInterests, setSelectedJobInterests, opt)}
+                      className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${isActive ? colorMap[opt].active : colorMap[opt].inactive}`}
+                    >
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Active filters summary & clear */}
+            {activeFilterCount > 0 && (
+              <div className="flex items-center gap-2 pt-1 flex-wrap">
+                <span className="text-xs text-slate-500">適用中:</span>
+                {[...selectedSkills, ...selectedInterests, ...selectedJobInterests].map(tag => (
+                  <span key={tag} className="flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-700 text-xs rounded-full border border-indigo-100">
+                    {tag}
+                    <button onClick={() => {
+                      if (selectedSkills.includes(tag)) toggleItem(selectedSkills, setSelectedSkills, tag);
+                      else if (selectedInterests.includes(tag)) toggleItem(selectedInterests, setSelectedInterests, tag);
+                      else toggleItem(selectedJobInterests, setSelectedJobInterests, tag);
+                    }}><X className="w-3 h-3" /></button>
+                  </span>
+                ))}
+                <button onClick={clearAll} className="text-xs text-red-500 hover:text-red-700 font-medium ml-1 flex items-center gap-0.5">
+                  <X className="w-3 h-3" /> すべてクリア
+                </button>
+              </div>
+            )}
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-lg text-sm font-medium transition-colors whitespace-nowrap shadow-sm">
-            <SlidersHorizontal className="w-4 h-4" />
-            <span className="hidden sm:inline">絞り込み</span>
-          </button>
-        </div>
+        )}
       </div>
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredStudents.map((student) => (
-          <StudentCard key={student.id} student={student} isCompanyView={isCompanyView} />
-        ))}
+        {filteredStudents.length > 0 ? (
+          filteredStudents.map((student) => (
+            <StudentCard key={student.id} student={student} isCompanyView={isCompanyView} />
+          ))
+        ) : (
+          <div className="col-span-full py-16 text-center">
+            <p className="text-slate-500 text-sm">条件に一致する参加者が見つかりません。</p>
+            <button onClick={clearAll} className="mt-3 text-indigo-600 text-sm font-medium hover:underline">絞り込みをリセット</button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -151,7 +349,18 @@ function StudentCard({ student, isCompanyView }: { student: typeof MOCK_STUDENTS
   );
 }
 
-// Just a simple helper icon component
+function HighlightMatch({ text, query }: { text: string; query: string }) {
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return <span>{text}</span>;
+  return (
+    <span>
+      {text.slice(0, idx)}
+      <mark className="bg-indigo-100 text-indigo-800 not-italic rounded-sm">{text.slice(idx, idx + query.length)}</mark>
+      {text.slice(idx + query.length)}
+    </span>
+  );
+}
+
 function UsersIcon(props: any) {
   return (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
