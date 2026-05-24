@@ -154,6 +154,43 @@ export function StudentList() {
           </div>
         </div>
 
+        {/* Active filter tags */}
+        {activeFilterCount > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs text-slate-400 flex-shrink-0">絞り込み中:</span>
+            {selectedSkills.map(tag => (
+              <span key={tag} className="flex items-center gap-1 pl-2 pr-1 py-0.5 bg-slate-100 text-slate-700 text-xs font-medium rounded-full border border-slate-200">
+                <span className="text-[10px] text-slate-400 font-normal mr-0.5">スキル</span>
+                {tag}
+                <button onClick={() => toggleItem(selectedSkills, setSelectedSkills, tag)} className="ml-0.5 hover:text-red-500 transition-colors">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            {selectedInterests.map(tag => (
+              <span key={tag} className="flex items-center gap-1 pl-2 pr-1 py-0.5 bg-indigo-50 text-indigo-700 text-xs font-medium rounded-full border border-indigo-100">
+                <span className="text-[10px] text-indigo-300 font-normal mr-0.5">興味</span>
+                {tag}
+                <button onClick={() => toggleItem(selectedInterests, setSelectedInterests, tag)} className="ml-0.5 hover:text-red-500 transition-colors">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            {selectedJobInterests.map(tag => (
+              <span key={tag} className="flex items-center gap-1 pl-2 pr-1 py-0.5 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full border border-emerald-100">
+                <span className="text-[10px] text-emerald-300 font-normal mr-0.5">就職</span>
+                {tag}
+                <button onClick={() => toggleItem(selectedJobInterests, setSelectedJobInterests, tag)} className="ml-0.5 hover:text-red-500 transition-colors">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            <button onClick={clearAll} className="text-xs text-red-400 hover:text-red-600 font-medium transition-colors ml-1">
+              すべてクリア
+            </button>
+          </div>
+        )}
+
         {/* Filter Panel */}
         {showFilter && (
           <div className="border-t border-slate-100 pt-4 space-y-4">
@@ -209,25 +246,6 @@ export function StudentList() {
               </div>
             </div>
 
-            {/* Active filters summary & clear */}
-            {activeFilterCount > 0 && (
-              <div className="flex items-center gap-2 pt-1 flex-wrap">
-                <span className="text-xs text-slate-500">適用中:</span>
-                {[...selectedSkills, ...selectedInterests, ...selectedJobInterests].map(tag => (
-                  <span key={tag} className="flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-700 text-xs rounded-full border border-indigo-100">
-                    {tag}
-                    <button onClick={() => {
-                      if (selectedSkills.includes(tag)) toggleItem(selectedSkills, setSelectedSkills, tag);
-                      else if (selectedInterests.includes(tag)) toggleItem(selectedInterests, setSelectedInterests, tag);
-                      else toggleItem(selectedJobInterests, setSelectedJobInterests, tag);
-                    }}><X className="w-3 h-3" /></button>
-                  </span>
-                ))}
-                <button onClick={clearAll} className="text-xs text-red-500 hover:text-red-700 font-medium ml-1 flex items-center gap-0.5">
-                  <X className="w-3 h-3" /> すべてクリア
-                </button>
-              </div>
-            )}
           </div>
         )}
       </div>
