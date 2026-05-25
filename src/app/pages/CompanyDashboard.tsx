@@ -7,7 +7,7 @@ import {
 import { MOCK_STUDENTS, MOCK_COMPANY_STATS } from "../data/mock";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend
+  PieChart, Pie, Cell, Legend, LabelList
 } from "recharts";
 
 type Tab = "dashboard" | "list" | "stats";
@@ -306,15 +306,17 @@ function StatsTab({
             <Building2 className="w-4 h-4 text-slate-500" />
             大学別参加者数
           </h3>
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={universityStats} layout="vertical" margin={{ left: 8, right: 24, top: 4, bottom: 4 }}>
+          <ResponsiveContainer width="100%" height={universityStats.length * 32 + 16}>
+            <BarChart data={universityStats} layout="vertical" margin={{ left: 8, right: 36, top: 4, bottom: 4 }}>
               <XAxis type="number" tick={{ fontSize: 11 }} allowDecimals={false} />
-              <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={110} />
+              <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={120} />
               <Tooltip
                 formatter={(v: number) => [`${v}名`, "参加者数"]}
                 contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}
               />
-              <Bar dataKey="count" fill="#6366f1" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="count" fill="#6366f1" radius={[0, 4, 4, 0]}>
+                <LabelList dataKey="count" position="right" formatter={(v: number) => `${v}名`} style={{ fontSize: 11, fill: "#64748b" }} />
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -325,35 +327,19 @@ function StatsTab({
             <GraduationCap className="w-4 h-4 text-slate-500" />
             学年別参加者数
           </h3>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={gradeStats} margin={{ left: 0, right: 16, top: 4, bottom: 4 }}>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={gradeStats} margin={{ left: 0, right: 16, top: 20, bottom: 4 }}>
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
               <Tooltip
                 formatter={(v: number) => [`${v}名`, "参加者数"]}
                 contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}
               />
-              <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]}>
+                <LabelList dataKey="count" position="top" formatter={(v: number) => `${v}名`} style={{ fontSize: 11, fill: "#64748b" }} />
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
-
-          {/* Grade breakdown list */}
-          <div className="mt-4 space-y-2">
-            {gradeStats.map(g => (
-              <div key={g.name} className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 w-20 flex-shrink-0">{g.name}</span>
-                <div className="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
-                  <div
-                    className="h-full bg-violet-400 rounded-full transition-all"
-                    style={{ width: `${(g.count / MOCK_STUDENTS.length) * 100}%` }}
-                  />
-                </div>
-                <span className="text-xs font-semibold text-slate-700 w-12 text-right">
-                  {g.count}名 ({Math.round((g.count / MOCK_STUDENTS.length) * 100)}%)
-                </span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 
