@@ -1,22 +1,26 @@
 import { useParams, useLocation } from "react-router";
-import { 
-  MapPin, BookOpen, GraduationCap, Github, Twitter, Linkedin, Mail, 
-  Target, Rocket, TrendingUp, Sparkles, MessageSquare, Briefcase, 
+import {
+  MapPin, BookOpen, GraduationCap, Github, Twitter, Linkedin, Mail,
+  Target, Rocket, TrendingUp, Sparkles, MessageSquare, Briefcase,
   ChevronRight, CalendarDays, ExternalLink, Activity
 } from "lucide-react";
-import { 
-  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, 
+import {
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, Legend, Tooltip, AreaChart, Area, XAxis, YAxis, CartesianGrid
 } from 'recharts';
 import { MOCK_STUDENTS } from "../data/mock";
+import { SKILL_MAP, GYOMU_MAP } from "../data/spaceSkillStandard";
+import { recommendRoles } from "../utils/roleRecommendation";
 
 export function StudentProfile() {
   const { id } = useParams();
   const location = useLocation();
   const isCompanyView = location.pathname.startsWith('/company');
-  
+
   // Use mock data or first student if ID not found (for prototype)
   const student = MOCK_STUDENTS.find(s => s.id === id) || MOCK_STUDENTS[0];
+
+  const recommendedRoles = recommendRoles(student.spaceSkills ?? [], student.gyomu ?? []);
 
   // Radar Chart Data Prep
   const radarData = student.skillMatrix.labels.map((label, index) => ({
@@ -92,6 +96,26 @@ export function StudentProfile() {
               <p className="mt-4 text-sm text-slate-700 leading-relaxed">
                 {student.bio}
               </p>
+
+              {recommendedRoles.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {recommendedRoles.map((m, i) => {
+                    const pct = Math.round(m.score * 100);
+                    const cls = i === 0
+                      ? "bg-amber-50 border-amber-200 text-amber-800"
+                      : i === 1
+                      ? "bg-slate-50 border-slate-200 text-slate-700"
+                      : "bg-orange-50 border-orange-200 text-orange-700";
+                    return (
+                      <div key={m.role.id} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium ${cls}`}>
+                        <Sparkles className="w-3 h-3 flex-shrink-0" />
+                        <span>{m.role.name}</span>
+                        <span className="font-bold opacity-70">{pct}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -100,7 +124,7 @@ export function StudentProfile() {
       {/* メイングリッド: 3カラム (左=AstroCampでの成長, 中=経歴・活動歴, 右=ソフトスキル成長 + 専門領域・技術 縦積み) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-        {/* AstroCampでの成長 (Before/After) — Activity Outcome 画像は削除 */}
+        {/* AstroCampでの成長 (Before/After) */}
         <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center">
@@ -200,28 +224,52 @@ export function StudentProfile() {
             </div>
           </section>
 
-          {/* 専門領域・技術 */}
-          <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
-            <h2 className="text-sm font-bold text-slate-900 mb-2.5 flex items-center gap-1.5">
-              <Activity className="w-3.5 h-3.5 text-indigo-500" />
+          {/* 専門領域・技術 (Space Skill Standard) */}
+          <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-indigo-500" />
               専門領域・技術
             </h2>
 
-            <div className="space-y-2">
-              <div>
-                <h3 className="text-[9px] font-bold text-slate-500 mb-1 uppercase tracking-wider">興味分野</h3>
-                <div className="flex flex-wrap gap-1">
-                  {student.interests.map(tag => (
-                    <span key={tag} className="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-[11px] rounded-md font-semibold border border-indigo-100/60">
-                      {tag}
-                    </span>
-                  ))}
+            <div className="space-y-5">
+              {/* スキル（宇宙スキル標準） */}
+              {student.spaceSkills && student.spaceSkills.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">スキル（宇宙スキル標準）</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {student.spaceSkills.map(id => {
+                      const s = SKILL_MAP.get(id);
+                      return s ? (
+                        <span key={id} className="px-3 py-1 bg-indigo-50 text-indigo-700 text-sm rounded-lg font-bold border border-indigo-100/50 hover:bg-indigo-100 transition-colors cursor-default">
+                          {s.name}
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
 
+              {/* 業務（宇宙スキル標準） */}
+              {student.gyomu && student.gyomu.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">業務（宇宙スキル標準）</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {student.gyomu.map(id => {
+                      const g = GYOMU_MAP.get(id);
+                      return g ? (
+                        <span key={id} className="px-3 py-1 bg-violet-50 text-violet-700 text-sm rounded-lg font-medium border border-violet-100/50 hover:bg-violet-100 transition-colors cursor-default">
+                          {g.name}
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* 詳細スキル */}
               <div>
-                <h3 className="text-[9px] font-bold text-slate-500 mb-1 uppercase tracking-wider">テクニカルスキル</h3>
-                <div className="flex flex-wrap gap-1">
+                <h3 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">詳細スキル</h3>
+                <div className="flex flex-wrap gap-2">
                   {student.skills.map(skill => (
                     <span key={skill} className="px-2 py-0.5 bg-slate-100 text-slate-700 text-[11px] rounded-md font-medium border border-slate-200/60">
                       {skill}
@@ -231,10 +279,46 @@ export function StudentProfile() {
               </div>
             </div>
           </section>
+
+          {/* 推奨ロール */}
+          {recommendedRoles.length > 0 && (
+            <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+              <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-amber-500" />
+                推奨ロール
+              </h2>
+              <div className="space-y-3">
+                {recommendedRoles.map((match, idx) => {
+                  const pct = Math.round(match.score * 100);
+                  const medals = ["1位", "2位", "3位"];
+                  const barColors = ["bg-amber-400", "bg-slate-400", "bg-orange-300"];
+                  const textColors = ["text-amber-600", "text-slate-500", "text-orange-500"];
+                  return (
+                    <div key={match.role.id} className="p-4 rounded-xl border border-slate-100 bg-slate-50/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs font-black ${textColors[idx] ?? "text-slate-500"}`}>{medals[idx] ?? `${idx+1}位`}</span>
+                          <span className="font-bold text-slate-800">{match.role.name}</span>
+                        </div>
+                        <span className={`text-sm font-black ${textColors[idx] ?? "text-slate-500"}`}>{pct}%</span>
+                      </div>
+                      <div className="text-xs text-slate-500 mb-2">{match.role.category}　{match.role.subcategory !== "ー" ? `/ ${match.role.subcategory}` : ""}</div>
+                      <div className="w-full bg-slate-200 rounded-full h-1.5">
+                        <div
+                          className={`${barColors[idx] ?? "bg-slate-400"} h-1.5 rounded-full transition-all`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </div>
       </div>
 
-      {/* キャリア意向 + リンク + 物理カード を 2 カラムで下部 */}
+      {/* キャリア意向 + リンク を 2 カラムで下部 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <section className="bg-white rounded-2xl shadow-sm border border-indigo-100 p-5 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
@@ -334,9 +418,12 @@ export function StudentProfile() {
                 <div className="relative z-10">
                   <p className="text-[9px] font-bold text-slate-800 mb-1 leading-snug">"{student.catchphrase}"</p>
                   <div className="flex gap-1">
-                    {student.interests.slice(0, 2).map(tag => (
-                      <span key={tag} className="text-[7px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded-sm font-medium">{tag}</span>
-                    ))}
+                    {(student.spaceSkills ?? []).slice(0, 2).map(id => {
+                      const s = SKILL_MAP.get(id);
+                      return s ? (
+                        <span key={id} className="text-[7px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded-sm font-medium">{s.name}</span>
+                      ) : null;
+                    })}
                   </div>
                 </div>
               </div>

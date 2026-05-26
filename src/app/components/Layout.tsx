@@ -24,7 +24,7 @@ export function Layout() {
     navigate('/');
   };
 
-  const currentRoleName = isCompanyView ? "JAXA採用品担当" : "星野 宇宙";
+  const currentRoleName = isCompanyView ? "ASE-Lab.採用担当" : "星野 宇宙";
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col">
