@@ -2,9 +2,10 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router";
 import {
   Users, BookmarkCheck, Sparkles, TrendingUp, ChevronRight,
-  BarChart2, ListFilter, GraduationCap, Building2, ArrowUpDown
+  BarChart2, ListFilter, GraduationCap, Building2, ArrowUpDown, Star
 } from "lucide-react";
 import { MOCK_STUDENTS, MOCK_COMPANY_STATS } from "../data/mock";
+import { recommendRoles } from "../utils/roleRecommendation";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, LabelList
@@ -14,6 +15,7 @@ type Tab = "dashboard" | "list" | "stats";
 type SortKey = "name" | "university" | "grade" | "jobInterest";
 
 const GRADE_ORDER = ["学部1年", "学部2年", "学部3年", "学部4年", "修士1年", "修士2年"];
+const UNIV_COLORS = ["#6366f1","#8b5cf6","#06b6d4","#10b981","#f59e0b","#ef4444","#ec4899","#84cc16","#f97316","#14b8a6"];
 const JOB_ORDER = ["興味あり", "検討中", "今は考えていない"];
 const JOB_COLOR: Record<string, string> = {
   "興味あり": "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -306,18 +308,37 @@ function StatsTab({
             <Building2 className="w-4 h-4 text-slate-500" />
             大学別参加者数
           </h3>
-          <ResponsiveContainer width="100%" height={universityStats.length * 32 + 16}>
-            <BarChart data={universityStats} layout="vertical" margin={{ left: 8, right: 36, top: 4, bottom: 4 }}>
-              <XAxis type="number" tick={{ fontSize: 11 }} allowDecimals={false} />
-              <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={120} />
+          <ResponsiveContainer width="100%" height={260}>
+            <PieChart>
+              <Pie
+                data={universityStats}
+                cx="50%"
+                cy="50%"
+                innerRadius={55}
+                outerRadius={90}
+                paddingAngle={2}
+                dataKey="count"
+                nameKey="name"
+                startAngle={90}
+                endAngle={-270}
+                labelLine={false}
+              >
+                {universityStats.map((_, i) => (
+                  <Cell key={i} fill={UNIV_COLORS[i % UNIV_COLORS.length]} />
+                ))}
+              </Pie>
               <Tooltip
-                formatter={(v: number) => [`${v}名`, "参加者数"]}
+                formatter={(v: number, name) => [`${v}名`, name]}
                 contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}
               />
-              <Bar dataKey="count" fill="#6366f1" radius={[0, 4, 4, 0]}>
-                <LabelList dataKey="count" position="right" formatter={(v: number) => `${v}名`} style={{ fontSize: 11, fill: "#64748b" }} />
-              </Bar>
-            </BarChart>
+              <Legend
+                formatter={(value, entry: any) => {
+                  const pct = Math.round((entry.payload?.percent ?? 0) * 100);
+                  return <span style={{ fontSize: 11 }}>{value}（{pct}%）</span>;
+                }}
+                iconSize={10}
+              />
+            </PieChart>
           </ResponsiveContainer>
         </div>
 
@@ -445,6 +466,7 @@ function MiniStat({ label, value, sub }: { label: string; value: string; sub: st
 }
 
 function CompactStudentRow({ student }: { student: typeof MOCK_STUDENTS[0] }) {
+  const topRole = recommendRoles(student.spaceSkills ?? [], student.gyomu ?? [], 1)[0];
   return (
     <div className="p-4 hover:bg-slate-50 transition-colors flex items-center gap-4">
       <img src={student.avatar} alt={student.name} className="w-12 h-12 rounded-full object-cover border border-slate-200 flex-shrink-0" />
@@ -461,6 +483,13 @@ function CompactStudentRow({ student }: { student: typeof MOCK_STUDENTS[0] }) {
             <span key={sk} className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded whitespace-nowrap">{sk}</span>
           ))}
         </div>
+        {topRole && (
+          <div className="flex items-center gap-1 mt-1.5">
+            <Star className="w-3 h-3 text-amber-500 flex-shrink-0" />
+            <span className="text-[10px] text-amber-700 font-medium truncate">{topRole.role.name}</span>
+            <span className="text-[10px] text-amber-500 font-bold whitespace-nowrap">{Math.round(topRole.score * 100)}%</span>
+          </div>
+        )}
       </div>
     </div>
   );

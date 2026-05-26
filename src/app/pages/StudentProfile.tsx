@@ -99,6 +99,26 @@ export function StudentProfile() {
                 <div className="absolute -left-2 -top-2 w-6 h-6 bg-white border border-slate-100 rounded-full flex items-center justify-center text-indigo-300 shadow-sm font-serif text-2xl leading-none pt-1">"</div>
                 {student.bio}
               </div>
+
+              {recommendedRoles.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {recommendedRoles.map((m, i) => {
+                    const pct = Math.round(m.score * 100);
+                    const cls = i === 0
+                      ? "bg-amber-50 border-amber-200 text-amber-800"
+                      : i === 1
+                      ? "bg-slate-50 border-slate-200 text-slate-700"
+                      : "bg-orange-50 border-orange-200 text-orange-700";
+                    return (
+                      <div key={m.role.id} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium ${cls}`}>
+                        <Sparkles className="w-3 h-3 flex-shrink-0" />
+                        <span>{m.role.name}</span>
+                        <span className="font-bold opacity-70">{pct}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>

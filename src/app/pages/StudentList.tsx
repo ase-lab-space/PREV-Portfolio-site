@@ -354,10 +354,10 @@ export function StudentList() {
 function StudentCard({ student, isCompanyView }: { student: typeof MOCK_STUDENTS[0], isCompanyView: boolean }) {
   const [bookmarked, setBookmarked] = useState(student.isBookmarked);
 
-  const topRole = useMemo(() => {
-    const matches = recommendRoles(student.spaceSkills ?? [], student.gyomu ?? [], 1);
-    return matches[0] ?? null;
-  }, [student]);
+  const topRoles = useMemo(
+    () => recommendRoles(student.spaceSkills ?? [], student.gyomu ?? [], 3),
+    [student]
+  );
 
   const interestColor = {
     "興味あり": "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -444,15 +444,17 @@ function StudentCard({ student, isCompanyView }: { student: typeof MOCK_STUDENTS
         </div>
       </div>
 
-      {/* Recommended role */}
-      {topRole && (
-        <div className="px-4 py-2.5 border-t border-slate-100 bg-amber-50/50">
-          <div className="flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
-            <span className="text-xs text-slate-600">推奨ロール:</span>
-            <span className="text-xs font-bold text-amber-700 truncate">{topRole.role.name}</span>
-            <span className="ml-auto text-xs font-black text-amber-600">{Math.round(topRole.score * 100)}%</span>
-          </div>
+      {/* Recommended roles */}
+      {topRoles.length > 0 && (
+        <div className="px-4 py-2.5 border-t border-slate-100 bg-amber-50/50 space-y-1.5">
+          {topRoles.map((m, i) => (
+            <div key={m.role.id} className="flex items-center gap-2">
+              <span className="text-[10px] font-bold text-amber-600 w-3">{i + 1}</span>
+              <Star className="w-3 h-3 text-amber-500 flex-shrink-0" />
+              <span className="text-xs font-medium text-amber-900 truncate flex-1">{m.role.name}</span>
+              <span className="text-xs font-black text-amber-600 whitespace-nowrap">{Math.round(m.score * 100)}%</span>
+            </div>
+          ))}
         </div>
       )}
 
