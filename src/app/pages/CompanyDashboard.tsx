@@ -308,12 +308,12 @@ function StatsTab({
             <Building2 className="w-4 h-4 text-slate-500" />
             大学別参加者数
           </h3>
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={400}>
             <PieChart>
               <Pie
                 data={universityStats}
                 cx="50%"
-                cy="50%"
+                cy="38%"
                 innerRadius={55}
                 outerRadius={90}
                 paddingAngle={2}
