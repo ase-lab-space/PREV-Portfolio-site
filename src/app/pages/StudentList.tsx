@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { Search, BookmarkPlus, BookmarkCheck, ChevronRight, SlidersHorizontal, Building2, BookOpen, X, Tag, Star } from "lucide-react";
-import { MOCK_STUDENTS } from "../data/mock";
+import { MOCK_STUDENTS, AEROSPACE_STUDENT_IDS } from "../data/mock";
 import { Link, useLocation } from "react-router";
 import { SPACE_SKILLS, GYOMU_LIST, SKILL_MAP, GYOMU_MAP } from "../data/spaceSkillStandard";
 import { recommendRoles } from "../utils/roleRecommendation";
@@ -11,6 +11,8 @@ const ALL_GYOMU_IDS = Array.from(new Set(MOCK_STUDENTS.flatMap(s => s.gyomu ?? [
 const JOB_OPTIONS = ["興味あり", "検討中", "今は考えていない"] as const;
 
 type Suggestion = { tag: string; id: string; type: "skill" | "spaceSkill" | "gyomu"; count: number };
+type AerospaceFilter = "all" | "aerospace" | "non-aerospace";
+const AEROSPACE_LABELS: Record<AerospaceFilter, string> = { all: "全て", aerospace: "航空宇宙", "non-aerospace": "非航空宇宙" };
 
 export function StudentList() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,6 +21,7 @@ export function StudentList() {
   const [selectedSpaceSkills, setSelectedSpaceSkills] = useState<string[]>([]);
   const [selectedGyomu, setSelectedGyomu] = useState<string[]>([]);
   const [selectedJobInterests, setSelectedJobInterests] = useState<string[]>([]);
+  const [aerospaceFilter, setAerospaceFilter] = useState<AerospaceFilter>("all");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -94,12 +97,15 @@ export function StudentList() {
     setSelectedGyomu([]);
     setSelectedJobInterests([]);
     setSearchTerm("");
+    setAerospaceFilter("all");
   };
 
   const activeFilterCount = selectedSkills.length + selectedSpaceSkills.length + selectedGyomu.length + selectedJobInterests.length;
 
   const filteredStudents = useMemo(() => {
     return MOCK_STUDENTS.filter(s => {
+      if (aerospaceFilter === "aerospace" && !AEROSPACE_STUDENT_IDS.has(s.id)) return false;
+      if (aerospaceFilter === "non-aerospace" && AEROSPACE_STUDENT_IDS.has(s.id)) return false;
       const spaceSkills = s.spaceSkills ?? [];
       const gyomu = s.gyomu ?? [];
       const spaceSkillNames = spaceSkills.map(id => SKILL_MAP.get(id)?.name ?? "");
@@ -116,7 +122,7 @@ export function StudentList() {
       const matchesJob = selectedJobInterests.length === 0 || selectedJobInterests.includes(s.jobInterest);
       return matchesSearch && matchesSkills && matchesSpaceSkills && matchesGyomu && matchesJob;
     });
-  }, [searchTerm, selectedSkills, selectedSpaceSkills, selectedGyomu, selectedJobInterests]);
+  }, [searchTerm, selectedSkills, selectedSpaceSkills, selectedGyomu, selectedJobInterests, aerospaceFilter]);
 
   const typeLabel: Record<string, string> = { skill: "詳細", spaceSkill: "スキル標準", gyomu: "業務" };
   const typeBadgeClass: Record<string, string> = {
@@ -132,11 +138,23 @@ export function StudentList() {
         <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">参加者一覧</h1>
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              <span className="text-xs font-semibold text-slate-400">分野:</span>
+              {(Object.keys(AEROSPACE_LABELS) as AerospaceFilter[]).map(f => (
+                <button
+                  key={f}
+                  onClick={() => setAerospaceFilter(f)}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${aerospaceFilter === f ? "bg-indigo-600 text-white border-indigo-600" : "bg-white text-slate-600 border-slate-200 hover:border-indigo-300 hover:text-indigo-600"}`}
+                >
+                  {AEROSPACE_LABELS[f]}
+                </button>
+              ))}
+            </div>
             <p className="text-sm text-slate-500 mt-1 flex items-center gap-1.5">
               <UsersIcon className="w-4 h-4" />
               <span className="font-semibold text-slate-700">{filteredStudents.length}名</span>
               {activeFilterCount > 0 && <span className="text-slate-400">/ {MOCK_STUDENTS.length}名中</span>}
-              {activeFilterCount === 0 && <span>の参加者が登録しています</span>}
+              {activeFilterCount === 0 && aerospaceFilter === "all" && <span>の参加者が登録しています</span>}
             </p>
           </div>
 

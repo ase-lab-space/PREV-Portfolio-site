@@ -889,6 +889,41 @@ export const MOCK_STUDENTS = [
   }
 ];
 
+export const AEROSPACE_STUDENT_IDS = new Set([
+  "stu-001", "stu-002", "stu-003", "stu-005", "stu-006", "stu-007", "stu-009",
+  "stu-011", "stu-013", "stu-014", "stu-015", "stu-017", "stu-018", "stu-019",
+  "stu-022", "stu-023", "stu-024", "stu-026",
+]);
+
+export const STUDENT_DEPARTMENTS: Record<string, string> = {
+  "stu-001": "電気情報工学科",
+  "stu-002": "航空宇宙工学科",
+  "stu-003": "化学・材料工学科",
+  "stu-004": "物理情報工学科",
+  "stu-005": "物理学科",
+  "stu-006": "宇宙システム工学科",
+  "stu-007": "航空宇宙工学科",
+  "stu-008": "社会科学科",
+  "stu-009": "航空宇宙工学科",
+  "stu-010": "応用理工学類",
+  "stu-011": "工学システム学類",
+  "stu-012": "情報科学科",
+  "stu-013": "工学システム学類",
+  "stu-014": "機械工学科",
+  "stu-015": "機械システム工学科",
+  "stu-016": "先進工学科",
+  "stu-017": "工学システム学類",
+  "stu-018": "航空宇宙工学科",
+  "stu-019": "機械知能工学科",
+  "stu-020": "データサイエンス学科",
+  "stu-021": "生物環境学専攻",
+  "stu-022": "航空宇宙工学科",
+  "stu-023": "航空宇宙工学科",
+  "stu-024": "電気情報物理工学科",
+  "stu-025": "建築学科",
+  "stu-026": "機械・航空宇宙工学科",
+};
+
 export const MOCK_COMPANY_STATS = {
   totalStudents: 26,
   skillDistribution: [
