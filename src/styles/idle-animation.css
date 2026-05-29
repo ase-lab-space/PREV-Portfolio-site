@@ -1,0 +1,84 @@
+/* Overlay entrance */
+@keyframes idle-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Slide content entrance */
+@keyframes idle-content-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Floating up-down */
+@keyframes idle-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+/* Orbiting dot */
+@keyframes idle-orbit {
+  from { transform: rotate(0deg)   translateX(52px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(52px) rotate(-360deg); }
+}
+
+/* Slow spin for ring */
+@keyframes idle-spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Slide in from right */
+@keyframes idle-slide-right {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Bar chart grow from bottom */
+@keyframes idle-bar-grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* Progress bar fill */
+@keyframes idle-progress {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+/* Pulse glow */
+@keyframes idle-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0); }
+  50%       { box-shadow: 0 0 24px 4px rgba(99,102,241,0.4); }
+}
+
+/* Star twinkle */
+@keyframes idle-twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.4); }
+}
+
+/* Classes */
+.idle-overlay    { animation: idle-overlay-in 0.5s ease-out both; }
+.idle-content-in { animation: idle-content-in 0.55s ease-out both; }
+.idle-float      { animation: idle-float 3.5s ease-in-out infinite; }
+.idle-orbit      { animation: idle-orbit 5s linear infinite; }
+.idle-spin-slow  { animation: idle-spin-slow 12s linear infinite; }
+.idle-slide-r-1  { animation: idle-slide-right 0.45s ease-out 0.05s both; }
+.idle-slide-r-2  { animation: idle-slide-right 0.45s ease-out 0.20s both; }
+.idle-slide-r-3  { animation: idle-slide-right 0.45s ease-out 0.35s both; }
+.idle-bar-1      { animation: idle-bar-grow 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.1s both; transform-origin: bottom; }
+.idle-bar-2      { animation: idle-bar-grow 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both; transform-origin: bottom; }
+.idle-bar-3      { animation: idle-bar-grow 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.3s both; transform-origin: bottom; }
+.idle-bar-4      { animation: idle-bar-grow 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.4s both; transform-origin: bottom; }
+.idle-bar-5      { animation: idle-bar-grow 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.5s both; transform-origin: bottom; }
+.idle-glow       { animation: idle-glow 3s ease-in-out infinite; }
+.idle-twinkle-1  { animation: idle-twinkle 2.1s ease-in-out 0.0s infinite; }
+.idle-twinkle-2  { animation: idle-twinkle 2.4s ease-in-out 0.7s infinite; }
+.idle-twinkle-3  { animation: idle-twinkle 1.9s ease-in-out 1.3s infinite; }
+.idle-twinkle-4  { animation: idle-twinkle 2.7s ease-in-out 0.4s infinite; }
+.idle-twinkle-5  { animation: idle-twinkle 2.2s ease-in-out 1.0s infinite; }
+
+/* Hide scrollbar cross-browser */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
