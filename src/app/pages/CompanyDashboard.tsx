@@ -5,7 +5,7 @@ import {
   BarChart2, ListFilter, GraduationCap, Building2, ArrowUpDown, Star,
   Trophy, Briefcase, BookOpen,
 } from "lucide-react";
-import { MOCK_STUDENTS, MOCK_COMPANY_STATS, AEROSPACE_STUDENT_IDS, STUDENT_DEPARTMENTS } from "../data/mock";
+import { MOCK_STUDENTS, MOCK_COMPANY_STATS, MOCK_COMPANIES, AEROSPACE_STUDENT_IDS, STUDENT_DEPARTMENTS } from "../data/mock";
 import { recommendRoles } from "../utils/roleRecommendation";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -30,16 +30,8 @@ const AEROSPACE_LABELS: Record<AerospaceFilter, string> = {
   "non-aerospace": "非航空宇宙",
 };
 
-const ACHIEVEMENTS_DATA = [
-  { name: "Space BD", description: "宇宙ビジネスを牽引する宇宙商社", type: "インターン採用", category: "宇宙ビジネス" },
-  { name: "Astroscale", description: "宇宙ゴミ除去の世界的リーディングカンパニー", type: "インターン採用", category: "デブリ除去" },
-  { name: "ArkEdge Space", description: "東大発の超小型衛星スタートアップ", type: "インターン採用", category: "超小型衛星" },
-  { name: "天地人", description: "JAXA認定スタートアップ", type: "インターン採用", category: "地球観測" },
-  { name: "Synspective", description: "日本を代表するSAR衛星スタートアップ", type: "インターン・内定", category: "SAR衛星" },
-  { name: "スカパーJSAT", description: "アジア最大の民間衛星通信事業者", type: "新卒入社", category: "衛星通信" },
-  { name: "燈株式会社", description: "東大松尾研発のAIスタートアップ", type: "インターン採用", category: "AI" },
-  { name: "Fusic", description: "宇宙×クラウド技術を牽引するテクノロジー企業", type: "インターン採用", category: "クラウド" },
-];
+// 実績タブで参照する企業データ（マスターは mock.ts の MOCK_COMPANIES）
+const ACHIEVEMENTS_DATA = MOCK_COMPANIES;
 
 export function CompanyDashboard() {
   const [searchParams] = useSearchParams();
@@ -66,14 +58,18 @@ export function CompanyDashboard() {
 
   const facultyStats = useMemo(() => {
     const map: Record<string, number> = {};
-    filteredStudents.forEach(s => { map[s.faculty] = (map[s.faculty] || 0) + 1; });
+    filteredStudents.forEach(s => {
+      const name = s.faculty.replace(/学群/g, "学部");
+      map[name] = (map[name] || 0) + 1;
+    });
     return Object.entries(map).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
   }, [filteredStudents]);
 
   const departmentStats = useMemo(() => {
     const map: Record<string, number> = {};
     filteredStudents.forEach(s => {
-      const dept = STUDENT_DEPARTMENTS[s.id] ?? "その他";
+      const raw = STUDENT_DEPARTMENTS[s.id] ?? "その他";
+      const dept = raw.replace(/学類/g, "学科");
       map[dept] = (map[dept] || 0) + 1;
     });
     return Object.entries(map).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
@@ -612,25 +608,31 @@ function AchievementsTab() {
             const conf = typeConfig[company.type] ?? typeConfig["インターン採用"];
             const TypeIcon = conf.icon;
             return (
-              <div
+              <Link
                 key={company.name}
-                className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col gap-4"
+                to={`/student/company/${company.id}`}
+                className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all p-6 flex flex-col gap-4"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0 pr-2">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{company.category}</span>
-                    <h3 className="text-xl font-bold text-slate-900 mt-0.5 truncate">{company.name}</h3>
+                    <h3 className="text-xl font-bold text-slate-900 mt-0.5 truncate group-hover:text-indigo-700 transition-colors">{company.name}</h3>
                   </div>
                   <span className="text-2xl font-black text-slate-100 flex-shrink-0">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 leading-relaxed flex-1">{company.description}</p>
-                <div className={`self-start flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold ${conf.bg} ${conf.text} ${conf.border}`}>
-                  <TypeIcon className="w-3.5 h-3.5" />
-                  {company.type}
+                <div className="flex items-center justify-between gap-2">
+                  <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold ${conf.bg} ${conf.text} ${conf.border}`}>
+                    <TypeIcon className="w-3.5 h-3.5" />
+                    {company.type}
+                  </div>
+                  <span className="flex items-center gap-1 text-xs font-semibold text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                    企業紹介 <ChevronRight className="w-3.5 h-3.5" />
+                  </span>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

@@ -548,7 +548,7 @@ export const MOCK_STUDENTS = [
     name: "天河 奏",
     avatar: "https://images.unsplash.com/photo-1536766768598-e09213fdcf22?w=150&h=150&fit=crop",
     university: "筑波大学",
-    faculty: "工学システム学類",
+    faculty: "理工学群",
     grade: "学部2年",
     bio: "宇宙探査ロボットの自律行動計画と環境認識に関心があります。ROSを使った移動ロボットのナビゲーションシステム開発と、強化学習を用いた自律意思決定の統合を目指しています。",
     spaceSkills: ["sk-112", "sk-159", "sk-101", "sk-40"],
@@ -923,6 +923,116 @@ export const STUDENT_DEPARTMENTS: Record<string, string> = {
   "stu-025": "建築学科",
   "stu-026": "機械・航空宇宙工学科",
 };
+
+// ─── 企業データ（企業紹介ページ / 実績タブ 共用） ──────────────────────────────
+// icon は lucide-react のアイコン名（文字列）。ページ側でコンポーネントにマッピングする。
+// gradient はヘッダーバナーの Tailwind グラデーション指定。
+export const MOCK_COMPANIES = [
+  {
+    id: "co-spacebd",
+    name: "Space BD",
+    description: "宇宙ビジネスを牽引する宇宙商社",
+    about:
+      "「宇宙商社®」として、ロケットや宇宙ステーションを活用した衛星打上げ・宇宙実験・教育事業など、宇宙ビジネスの裾野を多角的に広げる総合スペースサービスカンパニー。技術と事業開発の両面から、宇宙利用のハードルを下げる挑戦を続けている。",
+    category: "宇宙ビジネス",
+    type: "インターン採用",
+    icon: "Rocket",
+    accent: "indigo",
+    gradient: "from-indigo-500 via-violet-500 to-purple-500",
+    url: "https://space-bd.com/",
+  },
+  {
+    id: "co-astroscale",
+    name: "Astroscale",
+    description: "宇宙ゴミ除去の世界的リーディングカンパニー",
+    about:
+      "スペースデブリ（宇宙ゴミ）の除去・軌道上サービスを専門とする世界的リーディングカンパニー。持続可能な宇宙環境の実現をミッションに掲げ、デブリ除去実証衛星の開発・運用や、衛星の寿命延長サービスなどに取り組んでいる。",
+    category: "デブリ除去",
+    type: "インターン採用",
+    icon: "Orbit",
+    accent: "cyan",
+    gradient: "from-cyan-500 via-sky-500 to-blue-500",
+    url: "https://astroscale.com/",
+  },
+  {
+    id: "co-arkedge",
+    name: "ArkEdge Space",
+    description: "東大発の超小型衛星スタートアップ",
+    about:
+      "東京大学発の超小型衛星スタートアップ。衛星バスの開発からコンステレーション運用までを一気通貫で手がけ、海洋・物流・安全保障など多様な領域に超小型衛星ソリューションを提供している。",
+    category: "超小型衛星",
+    type: "インターン採用",
+    icon: "Satellite",
+    accent: "violet",
+    gradient: "from-violet-500 via-purple-500 to-fuchsia-500",
+    url: "https://www.arkedgespace.com/",
+  },
+  {
+    id: "co-tenchijin",
+    name: "天地人",
+    description: "JAXA認定スタートアップ",
+    about:
+      "JAXA認定ベンチャーとして、衛星データと地上データを掛け合わせた「宇宙ビッグデータ」の解析プラットフォームを展開。農業・水道・インフラなど、地上の課題を宇宙からの視点で解決するスタートアップ。",
+    category: "地球観測",
+    type: "インターン採用",
+    icon: "Globe",
+    accent: "emerald",
+    gradient: "from-emerald-500 via-teal-500 to-cyan-500",
+    url: "https://tenchijin.co.jp/",
+  },
+  {
+    id: "co-synspective",
+    name: "Synspective",
+    description: "日本を代表するSAR衛星スタートアップ",
+    about:
+      "小型SAR（合成開口レーダー）衛星のコンステレーションを構築する、日本を代表する宇宙スタートアップ。天候や昼夜を問わず地表を観測できるSARデータを活用し、防災・インフラモニタリングなどのソリューションを提供している。",
+    category: "SAR衛星",
+    type: "インターン・内定",
+    icon: "Radar",
+    accent: "blue",
+    gradient: "from-blue-500 via-indigo-500 to-violet-500",
+    url: "https://synspective.com/",
+  },
+  {
+    id: "co-skyperfectjsat",
+    name: "スカパーJSAT",
+    description: "アジア最大の民間衛星通信事業者",
+    about:
+      "アジア最大級の民間衛星通信事業者であり、放送・通信インフラを支える静止衛星を多数運用。宇宙事業とメディア事業の双方を展開し、近年はスペースデブリ除去など宇宙の持続可能性にも取り組んでいる。",
+    category: "衛星通信",
+    type: "新卒入社",
+    icon: "SatelliteDish",
+    accent: "sky",
+    gradient: "from-sky-500 via-blue-500 to-indigo-500",
+    url: "https://www.skyperfectjsat.space/",
+  },
+  {
+    id: "co-akari",
+    name: "燈株式会社",
+    description: "東大松尾研発のAIスタートアップ",
+    about:
+      "東京大学松尾研究室発のAIスタートアップ。建設業をはじめとする産業領域に対し、生成AI・機械学習を活用したDXソリューションを提供。最先端のAI技術を社会実装する事業を展開している。",
+    category: "AI",
+    type: "インターン採用",
+    icon: "Cpu",
+    accent: "amber",
+    gradient: "from-amber-500 via-orange-500 to-rose-500",
+    url: "https://www.akari-inc.co.jp/",
+  },
+  {
+    id: "co-fusic",
+    name: "Fusic",
+    description: "宇宙×クラウド技術を牽引するテクノロジー企業",
+    about:
+      "クラウド・IoT・機械学習などの先端技術を強みとする福岡発のテクノロジー企業。AWSのパートナーとして数多くのシステム開発を手がけ、宇宙領域でも衛星データ活用やクラウド基盤構築に取り組んでいる。",
+    category: "クラウド",
+    type: "インターン採用",
+    icon: "Cloud",
+    accent: "teal",
+    gradient: "from-teal-500 via-cyan-500 to-sky-500",
+    url: "https://fusic.co.jp/",
+  },
+];
 
 export const MOCK_COMPANY_STATS = {
   totalStudents: 26,
