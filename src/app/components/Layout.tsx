@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import {
   Rocket, Users, BookOpen, Settings, LogOut, ChevronDown, Bell,
   X, Trophy, User, Building2, ChevronRight, ChevronLeft, Sparkles,
+  MessageSquare,
 } from "lucide-react";
 import { useIdleTimer } from "../hooks/useIdleTimer";
 import { IdleAnimation } from "./IdleAnimation";
@@ -53,9 +54,12 @@ export function Layout() {
         { path: "/company/dashboard", label: "ダッシュボード", icon: Rocket },
         { path: "/company/students", label: "参加者を探す", icon: Users },
         { path: "/company/bookmarks", label: "ブックマーク", icon: BookOpen },
+        { path: "/company/messages", label: "メッセージ", icon: MessageSquare },
       ]
     : [
         { path: "/student/home", label: "ホーム", icon: Users },
+        { path: "/student/companies", label: "企業紹介", icon: Building2 },
+        { path: "/student/messages", label: "メッセージ", icon: MessageSquare },
         { path: "/student/profile", label: "マイページ", icon: Settings },
       ];
 
@@ -64,6 +68,8 @@ export function Layout() {
   const sideNavItems = [
     { to: "/student/home", icon: User, label: "個人", desc: "参加者プロフィール・一覧" },
     { to: "/company/dashboard", icon: Building2, label: "企業", desc: "企業ダッシュボード" },
+    { to: "/student/companies", icon: Sparkles, label: "企業紹介", desc: "宇宙関連企業の紹介" },
+    { to: isCompanyView ? "/company/messages" : "/student/messages", icon: MessageSquare, label: "メッセージ", desc: "企業と学生のダイレクトメッセージ" },
     { to: "/company/dashboard?tab=achievements", icon: Trophy, label: "実績", desc: "活動実績・経歴" },
   ];
 
