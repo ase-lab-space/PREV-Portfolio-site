@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useParams, useLocation } from "react-router";
 import {
   MapPin, BookOpen, GraduationCap, Github, Twitter, Linkedin, Mail,
   Target, Rocket, TrendingUp, Sparkles, MessageSquare, Briefcase,
-  ChevronRight, CalendarDays, ExternalLink, Activity
+  ChevronRight, CalendarDays, ExternalLink, Activity, Send
 } from "lucide-react";
+import { DmPanel } from "../components/DmPanel";
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, Legend, Tooltip, AreaChart, Area, XAxis, YAxis, CartesianGrid
@@ -16,6 +18,7 @@ export function StudentProfile() {
   const { id } = useParams();
   const location = useLocation();
   const isCompanyView = location.pathname.startsWith('/company');
+  const [dmOpen, setDmOpen] = useState(false);
 
   // Use mock data or first student if ID not found (for prototype)
   const student = MOCK_STUDENTS.find(s => s.id === id) || MOCK_STUDENTS[0];
@@ -70,10 +73,21 @@ export function StudentProfile() {
                   </p>
                 </div>
 
-                <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm shadow-indigo-600/20 active:scale-95 whitespace-nowrap">
-                  <MessageSquare className="w-4 h-4" />
-                  スカウトメッセージ
-                </button>
+                {isCompanyView && (
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => setDmOpen(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm shadow-indigo-600/20 active:scale-95 whitespace-nowrap"
+                    >
+                      <Send className="w-4 h-4" />
+                      DM
+                    </button>
+                    <button className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-indigo-700 border border-indigo-200 rounded-lg text-sm font-semibold transition-colors active:scale-95 whitespace-nowrap">
+                      <MessageSquare className="w-4 h-4" />
+                      スカウトメッセージ
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* 学校・学年・キャンパスのチップ群 */}
@@ -445,6 +459,9 @@ export function StudentProfile() {
           </div>
         </section>
       )}
+
+      {/* DM パネル（右サイドスライド） */}
+      <DmPanel open={dmOpen} onClose={() => setDmOpen(false)} student={student} />
     </div>
   );
 }
